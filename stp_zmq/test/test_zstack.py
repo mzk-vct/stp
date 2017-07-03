@@ -119,3 +119,38 @@ set a fixture parameter to do so.
 * test/pool_transactions package
 
 """
+
+
+# def test_high_load(tdir, looper, tconf):
+#     """
+#     Create 2 ZStack and make them send and receive messages.
+#     Both stacks allow communication even when keys are not shared
+#     :return:
+#     """
+#
+#     expected_messages = []
+#     received_messages = []
+#
+#     def f(wrapped_message):
+#         msg, sender = wrapped_message
+#         received_messages.append(msg)
+#
+#     alpha = ZStack("Alpha", ha=genHa(), basedirpath=tdir, msgHandler=None,
+#                    restricted=False, seed=randomSeed(), config=tconf)
+#     beta = ZStack("Beta", ha=genHa(), basedirpath=tdir, msgHandler=f,
+#                   restricted=False, seed=randomSeed(), config=tconf)
+#
+#     prepStacks(looper, alpha, beta, connect=True, useKeys=True)
+#
+#     for i in range(110000):
+#         msg = {'x': i}
+#         expected_messages.append(msg)
+#         alpha.send(msg, beta.name)
+#
+#     looper.runFor(10)
+#
+#     assert len(received_messages) != 0
+#     assert len(expected_messages) == len(received_messages), \
+#         "{} != {}".format(len(expected_messages), len(received_messages))
+#     assert expected_messages == received_messages
+#
