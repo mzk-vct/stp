@@ -11,7 +11,6 @@ import os
 import shutil
 import sys
 import time
-from abc import abstractmethod
 from binascii import hexlify, unhexlify
 from collections import deque
 from typing import Dict, Mapping, Tuple, Any, Union
@@ -24,7 +23,6 @@ from stp_core.crypto.util import isHex, ed25519PkToCurve25519
 from stp_core.network.exceptions import PublicKeyNotFoundOnDisk, VerKeyNotFoundOnDisk
 from stp_zmq.authenticator import MultiZapAuthenticator
 from zmq.utils import z85
-from zmq.utils.monitor import recv_monitor_message
 
 import zmq
 from stp_core.common.log import getlogger
@@ -113,7 +111,6 @@ class ZStack(NetworkInterface):
         return self._created
 
     @property
-    @abstractmethod
     def name(self):
         return self._name
 
@@ -547,7 +544,6 @@ class ZStack(NetworkInterface):
                 break
         return x + 1
 
-    @abstractmethod
     def doProcessReceived(self, msg, frm, ident):
         return msg
 
@@ -915,6 +911,10 @@ class ZStack(NetworkInterface):
 
     def clearRemoteKeeps(self):
         pass
+
+
+
+
 
 
 class DummyKeep:

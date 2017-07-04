@@ -3,6 +3,7 @@ import time
 import zmq
 from stp_core.common.log import getlogger
 import sys
+from zmq.utils.monitor import recv_monitor_message
 
 
 logger = getlogger()
