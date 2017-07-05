@@ -915,10 +915,6 @@ class ZStack(NetworkInterface):
         pass
 
 
-
-
-
-
 class DummyKeep:
     def __init__(self, stack, *args, **kwargs):
         self.stack = stack
@@ -940,5 +936,3 @@ class DummyKeep:
                 self.stack.setRestricted(False)
             if mode == 0:
                 self.stack.setRestricted(True)
-
-
