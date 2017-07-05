@@ -4,18 +4,24 @@ import zmq
 from stp_core.common.log import getlogger
 import sys
 from zmq.utils.monitor import recv_monitor_message
-
+from zmq.sugar.socket import Socket
 
 logger = getlogger()
 
 
-def set_keepalive(sock, config):
+def set_keepalive(socket: Socket, config):
     # This assumes the same TCP_KEEPALIVE configuration for all sockets which
     # is not ideal but matches what we do in code
-    sock.setsockopt(zmq.TCP_KEEPALIVE, 1)
-    sock.setsockopt(zmq.TCP_KEEPALIVE_INTVL, config.KEEPALIVE_INTVL)
-    sock.setsockopt(zmq.TCP_KEEPALIVE_IDLE, config.KEEPALIVE_IDLE)
-    sock.setsockopt(zmq.TCP_KEEPALIVE_CNT, config.KEEPALIVE_CNT)
+    socket.setsockopt(zmq.TCP_KEEPALIVE, 1)
+    socket.setsockopt(zmq.TCP_KEEPALIVE_INTVL, config.KEEPALIVE_INTVL)
+    socket.setsockopt(zmq.TCP_KEEPALIVE_IDLE, config.KEEPALIVE_IDLE)
+    socket.setsockopt(zmq.TCP_KEEPALIVE_CNT, config.KEEPALIVE_CNT)
+
+
+def set_zmq_internal_queue_length(socket: Socket, config):
+    # set both ZMQ_RCVHWM and ZMQ_SNDHWM
+    socket.set_hwm(config.ZMQ_INTERNAL_QUEUE_SIZE)
+
 
 
 class Remote:
@@ -71,6 +77,7 @@ class Remote:
         sock.curve_serverkey = self.publicKey
         sock.identity = localPubKey
         set_keepalive(sock, self.config)
+        set_zmq_internal_queue_length(sock, self.config)
         addr = 'tcp://{}:{}'.format(*self.ha)
         sock.connect(addr)
         self.socket = sock

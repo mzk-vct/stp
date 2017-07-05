@@ -29,7 +29,7 @@ from stp_core.common.log import getlogger
 from stp_core.network.network_interface import NetworkInterface
 from stp_zmq.util import createEncAndSigKeys, \
     moveKeyFilesToCorrectLocations, createCertsFromKeys
-from stp_zmq.remote import Remote, set_keepalive
+from stp_zmq.remote import Remote, set_keepalive, set_zmq_internal_queue_length
 
 logger = getlogger()
 
@@ -337,6 +337,7 @@ class ZStack(NetworkInterface):
         self.listener.identity = self.publicKey
         logger.debug('{} will bind its listener at {}'.format(self, self.ha[1]))
         set_keepalive(self.listener, self.config)
+        set_zmq_internal_queue_length(self.listener, self.config)
         self.listener.bind(
             'tcp://*:{}'.format(self.ha[1]))
 
