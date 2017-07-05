@@ -35,6 +35,7 @@ logger = getlogger()
 
 
 # TODO: Use Async io
+# TODO: There a number of methods related to keys management, they can be moved to some class like KeysManager
 class ZStack(NetworkInterface):
     # Assuming only one listener per stack for now.
 

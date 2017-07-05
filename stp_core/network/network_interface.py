@@ -9,6 +9,7 @@ from stp_core.types import HA
 logger = getlogger()
 
 
+# TODO: There a number of methods related to keys management, they can be moved to some class like KeysManager
 class NetworkInterface(metaclass=ABCMeta):
     localips = ['127.0.0.1', '0.0.0.0']
 
