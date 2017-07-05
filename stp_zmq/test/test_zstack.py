@@ -9,6 +9,7 @@ from stp_core.test.helper import Printer, prepStacks, chkPrinted
 from stp_zmq.test.helper import genKeys, create_and_prep_stacks, \
     check_stacks_communicating, get_file_permission_mask, get_zstack_key_paths
 from stp_zmq.zstack import ZStack
+import time
 
 
 def testRestricted2ZStackCommunication(tdir, looper, tconf):
@@ -121,36 +122,46 @@ set a fixture parameter to do so.
 """
 
 
-# def test_high_load(tdir, looper, tconf):
-#     """
-#     Create 2 ZStack and make them send and receive messages.
-#     Both stacks allow communication even when keys are not shared
-#     :return:
-#     """
-#
-#     expected_messages = []
-#     received_messages = []
-#
-#     def f(wrapped_message):
-#         msg, sender = wrapped_message
-#         received_messages.append(msg)
-#
-#     alpha = ZStack("Alpha", ha=genHa(), basedirpath=tdir, msgHandler=None,
-#                    restricted=False, seed=randomSeed(), config=tconf)
-#     beta = ZStack("Beta", ha=genHa(), basedirpath=tdir, msgHandler=f,
-#                   restricted=False, seed=randomSeed(), config=tconf)
-#
-#     prepStacks(looper, alpha, beta, connect=True, useKeys=True)
-#
-#     for i in range(110000):
-#         msg = {'x': i}
-#         expected_messages.append(msg)
-#         alpha.send(msg, beta.name)
-#
-#     looper.runFor(10)
-#
-#     assert len(received_messages) != 0
-#     assert len(expected_messages) == len(received_messages), \
-#         "{} != {}".format(len(expected_messages), len(received_messages))
-#     assert expected_messages == received_messages
-#
+def test_high_load(tdir, looper, tconf):
+    """
+    Checks whether ZStack can cope with high message rate 
+    """
+
+    letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
+               'H', 'I', 'J', 'K', 'L', 'M', 'N',
+               'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+               'V', 'W', 'X', 'Y', 'Z']
+
+    num_of_senders = 3
+    num_of_requests_per_sender = 100000
+
+    expected_messages = []
+    received_messages = []
+
+    def handler(wrapped_message):
+        msg, sender = wrapped_message
+        received_messages.append(msg)
+
+    def create_stack(name, handler=None):
+        return ZStack(name, ha=genHa(), basedirpath=tdir,
+                      msgHandler=handler, restricted=False,
+                      seed=randomSeed(), config=tconf)
+
+    senders = [create_stack(letter) for letter in letters[:num_of_senders]]
+    gamma = create_stack("Gamma", handler)
+    prepStacks(looper, *senders, gamma, connect=True, useKeys=True)
+
+    for i in range(num_of_requests_per_sender):
+        for sender in senders:
+            msg = {sender.name: i}
+            expected_messages.append(msg)
+            sender.send(msg, gamma.name)
+
+    looper.runFor(5)
+
+    assert len(received_messages) != 0
+    assert len(expected_messages) == len(received_messages), \
+        "{} != {}, LAST IS {}"\
+            .format(len(expected_messages),
+                    len(received_messages),
+                    received_messages[-1])

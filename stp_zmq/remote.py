@@ -23,7 +23,6 @@ def set_zmq_internal_queue_length(socket: Socket, config):
     socket.set_hwm(config.ZMQ_INTERNAL_QUEUE_SIZE)
 
 
-
 class Remote:
     def __init__(self, name, ha, verKey, publicKey, config=None):
         # TODO, remove *args, **kwargs after removing test
